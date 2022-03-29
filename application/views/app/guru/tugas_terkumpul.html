@@ -1,0 +1,197 @@
+<!-- Page Header-->
+<header class="page-header">
+	<div class="container-fluid">
+		<h2 class="no-margin-bottom judul">Judul : </h2>
+	</div>
+</header>
+<!-- Dashboard Section-->
+<section class="dashboard-counts no-padding-bottom">
+	<div class="container-fluid">
+		<div class="row bg-white has-shadow">
+			<div class="col-xl-12 col-sm-12">
+				<!-- Button trigger modal -->
+				<div class="table-responsive">
+					<table id="example" class="display table table-stipped table-bordered table-hover"
+						style="width:100%">
+						<thead>
+							<tr>
+								<th>NO</th>
+								<th>NIS</th>
+								<th>Nama</th>
+								<th>Tanggal</th>
+								<th>Nilai</th>
+								<th>Link</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th>NO</th>
+								<th>NIS</th>
+								<th>Nama</th>
+								<th>Tanggal</th>
+								<th>Nilai</th>
+								<th>Link</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+
+				<button type="button" class="btn btn-secondary" onclick="javascript:btnBack();"><i class="fa fa-arrow-left fa-fw"></i> Kembali</button>
+				<button type="button" class="btn btn-success float-right" onclick="$.fn.btnSave();"><i class="fa fa-save fa-fw"></i> Simpan Nilai</button>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+<!------------------ script --------------------->
+<script>
+	function btnBack() {
+		callPage("tugas.html", localStorage.getItem("menu"));
+	}
+
+	function loadSoalPG(judul,id_tugas,nis) {
+		localStorage.setItem("judul_tugas_siswa", judul);
+		localStorage.setItem("id_tugas", id_tugas);
+		localStorage.setItem("nis", nis);
+		callPage("buka_soalPG.html", localStorage.getItem("menu"));
+	}
+
+	function loadSoalESSAY(judul,id_tugas,nis) {
+		localStorage.setItem("judul_tugas_siswa", judul);
+		localStorage.setItem("id_tugas", id_tugas);
+		localStorage.setItem("nis", nis);
+		callPage("buka_soalESSAY.html", localStorage.getItem("menu"));
+	}
+
+	function loadSoalFILE(judul,id_tugas,nis) {
+		localStorage.setItem("judul_tugas_siswa", judul);
+		localStorage.setItem("id_tugas", id_tugas);
+		localStorage.setItem("nis", nis);
+		callPage("buka_soalFILE.html", localStorage.getItem("menu"));
+	}
+
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		// datatables
+		$('.judul').html('Judul : ' + localStorage.getItem("judul_tugas_terkumpul"));
+		var t = $('#example').DataTable({
+			// "stateSave": true,
+			"processing": true,
+			"ajax": {
+				"url": url + "/api/data/daftar_nilai",
+				"type": "GET",
+				"dataType": "json",
+				"data": {
+					'id': localStorage.getItem("id_tugas_terkumpul"),
+					'kode': localStorage.getItem("kode_kelas")
+				}
+			},
+			"order": [
+				[3, 'desc']
+			],
+			"columns": [{
+					"data": null,
+					"width": "50px",
+					"sClass": "text-center",
+					"orderable": false,
+				},
+				{
+					"data": "nis"
+				},
+				{
+					"data": "fullname"
+				},
+				{
+					"data": "tanggal",
+					"mRender": function (data, type, row) 
+					{
+						if(data > 0){
+							x = timeConverter(data);
+							if(data > row.batas_waktu){
+								x += " (terlambat)";
+							}
+							return x;
+						}else{
+							return "-";
+						}
+					}
+				},
+				{
+					"data": "nilai",
+					"orderable": false,
+					"mRender": function (data, type, row)
+					{
+						if(row.tipe_soal == "PG"){
+							return "<input type='text' disabled class='data-nilai' id-tugas='"+row.id_tugas+"' nis='"+row.nis+"' value='"+data+"' maxlength='3' size='2' onkeyup='if(this.value > 100) return this.value = 100;'>";
+						}else{
+							return "<input type='text' class='data-nilai' id-tugas='"+row.id_tugas+"' nis='"+row.nis+"' value='"+data+"' maxlength='3' size='2' onkeyup='if(this.value > 100) return this.value = 100;'>";
+						}
+					}
+				},
+				{
+					"data": "id",
+					"sClass": "text-center",
+					"orderable": false,
+					"mRender": function (data, type, row) 
+					{
+						if(row.tipe_soal == "PG"){
+							return `<a href="javascript:loadSoalPG('` + row.judul + `','` + data +`','` + row.nis + `');" class="badge badge-info"><i class="fa fa-eye fa-fw"></i> Lihat Jawaban</a>`;
+						}else if(row.tipe_soal == "ESSAY"){
+							return `<a href="javascript:loadSoalESSAY('` + row.judul + `','` + data +`','` + row.nis + `');" class="badge badge-info"><i class="fa fa-eye fa-fw"></i> Lihat Jawaban</a>`;
+						}else if(row.tipe_soal == "FILE"){
+							return `<a href="javascript:loadSoalFILE('` + row.judul + `','` + data +`','` + row.nis + `');" class="badge badge-info"><i class="fa fa-eye fa-fw"></i> Lihat Jawaban</a>`;
+						}
+					}
+				}
+			],
+		});
+		t.on('order.dt search.dt', function () {
+			t.column(0, {
+				search: 'applied',
+				order: 'applied'
+			}).nodes().each(function (cell, i) {
+				cell.innerHTML = i + 1;
+			});
+		}).draw();
+
+		$.fn.btnSave = function(){
+			// alert('hi');
+			var bulk = `{"bulk_nilai":[`;
+			total_baris = $('.data-nilai').length;
+			for (var i = 0; i <= (total_baris-1); i++) {
+				id_tugas = $('.data-nilai')[i]["attributes"]["id-tugas"].value;
+				nis = $('.data-nilai')[i]["attributes"]["nis"].value;
+				nilai = $('.data-nilai')[i].value;
+				bulk += `["`+id_tugas+`","`+nis+`","`+nilai+`"]`;
+				if(i!=(total_baris-1)){
+					bulk += `,`;
+				}
+				// console.log('nis = '+nis)
+				// console.log('id_tugas = '+id_tugas)
+				// console.log('nilai = '+nilai)
+
+			}
+			bulk += `]}`;
+			console.log(bulk)
+			$.ajax({
+				url: url+'/api/data/bulk_nilai',
+				type: 'GET',
+			    dataType: 'json',
+			    data: {
+			    	'bulk': bulk,
+			    },
+			    success: function(result){
+					// console.log(result);
+					result.status == true ? swal ("Berhasil!", result.message, "success") : swal("Error!", result.message, "error");
+			    },
+			    error: function(error){
+			    	swal("Error!", "koneksi bermasalah" , "error");
+			    }
+			})
+		}
+	});
+</script>

@@ -1,0 +1,169 @@
+<!-- Page Header-->
+<header class="page-header">
+  <div class="container-fluid">
+    <h2 class="no-margin-bottom">Home</h2>
+  </div>
+</header>
+<!-- Dashboard Section-->
+<section class="dashboard-counts no-padding-bottom">
+  <div class="container-fluid">
+    <div class="row bg-white has-shadow">
+      <!-- <div class="col-xl-3 col-sm-6">
+        
+        <img id="gambar" class="img-fluid rounded user_photo border border-info" src="">
+      </div> -->
+      <div class="col-xl-9 col-sm-12">
+        <div id="welcome">Selamat datang <b>user</b></div> 
+        <br>
+        <div id="t_tahun_ajaran"></div>
+        <div id="t_semester"></div>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalScrollable" onclick="javascript:btnEdit();" id="btn-tambah"><i class="fa fa-edit fa-fw"></i> Ubah</button>
+      </div>
+      <!-- <div class="col-xl-3 col-sm-6">
+        test
+      </div>
+      <div class="col-xl-3 col-sm-6">
+        test
+      </div> -->
+      <!-- <div class="col-xl-12 col-sm-12 text-center">
+      </div> -->
+    </div>
+  </div>
+</section>
+
+
+
+<!------------------------------ Modal -------------------------------->
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalScrollableTitle">Ubah Tahun Ajaran</h5>
+        <button type="button" id="close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-validate" id="submit">
+          <div class="form-group" id="input-id" hidden="true">
+            <label for="nis" class="col-form-label">NIS</label>
+            <input id="nis" type="text" name="nis" required data-msg="Please enter your nis" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="tahun_ajaran" class="col-form-label">Tahun Ajaran</label>
+            <select id="tahun_ajaran" name="tahun_ajaran" required class="form-control" onclick="">
+              <!-- <option id="aktif" value="aktif">Aktif</option> -->
+              <!-- <option id="nonaktif" value="nonaktif">Tidak Aktif</option> -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="semester" class="col-form-label">Semester</label>
+            <select id="semester" name="semester" required class="form-control" onclick="">
+              <option id="ganjil" value="1">Ganjil</option>
+              <option id="genap" value="2">Genap</option>
+            </select>
+          </div>
+          <script>
+          myFunction();
+          function myFunction() {
+            var d = new Date();
+            var n = d.getFullYear();
+            let text = "";
+            for(let i = 2000; i <= n; i++){
+                // document.write("<p>Perulangan ke-" + i + "</p>")
+                if ((localStorage.getItem("tahun_ajaran")) == (i+`-`+(i+1))) {
+                  text = text+`<option id="`+i+`-`+(i+1)+`" value="`+i+`-`+(i+1)+`" selected>`+i+`/`+(i+1)+`</option>`;
+                }else{
+                  text = text+`<option id="`+i+`-`+(i+1)+`" value="`+i+`-`+(i+1)+`">`+i+`/`+(i+1)+`</option>`;
+                }
+            };
+            document.getElementById("tahun_ajaran").innerHTML = text;
+
+            if (localStorage.getItem("semester") == 1) {
+              var select_semester = `
+              <option id="ganjil" value="1" selected>Ganjil</option>
+              <option id="genap" value="2">Genap</option>
+              `;
+            }else{
+              var select_semester = `
+              <option id="ganjil" value="1">Ganjil</option>
+              <option id="genap" value="2" selected>Genap</option>
+              `;
+            }
+            document.getElementById("semester").innerHTML = select_semester;
+            document.getElementById("nis").value = localStorage.getItem("no_induk");
+          }
+          </script>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" onclick="javascript:tambah();" id="btn-save">Save</button>
+        <button type="submit" class="btn btn-warning" onclick="javascript:edit();" id="btn-edit">Edit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+  $('#welcome').html('Selamat datang <b>'+localStorage.getItem("fullname")+'</b>');
+  $('#gambar').attr('src',url+'/upload/'+localStorage.getItem("user_photo"));
+  var data_tahun_ajaran = localStorage.getItem("tahun_ajaran");
+  var tahun_ajaran = data_tahun_ajaran.replace('-', '/');
+  $('#t_tahun_ajaran').html("Tahun Ajaran : "+tahun_ajaran);
+  if (localStorage.getItem("semester") == 1) {
+    var semester = "Ganjil";
+  }else{
+    var semester = "Genap";
+  }
+  $('#t_semester').html("Semester : "+semester);
+
+
+function btnEdit(id){
+    //setting modals
+    $("#exampleModalScrollable").modal("show");
+    $("#input-id").removeClass("d-none");
+    $("#btn-edit").removeClass("d-none");
+    $("#btn-save").addClass("d-none");  
+  }
+
+
+  function edit(){
+    var form = $("form")[0];
+    var e_thn_ajr = $("#tahun_ajaran").val();
+    var e_sem = $("#semester").val();
+    $.ajax({
+      url: url+'/api/data/edit_tahun_ajaran', //link json
+      type: 'POST',
+      data: new FormData(form),
+      processData: false,
+      contentType: false,
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          localStorage.setItem("tahun_ajaran", e_thn_ajr);
+          localStorage.setItem("semester", e_sem);
+          $('#exampleModalScrollable').modal('hide');
+          $('body').removeAttr('style');
+          $('body').removeAttr('class');
+          $('.modal-backdrop').remove();
+          callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refresh page
+          swal({
+            title: "Sukses",
+            text: result.message,
+            icon: "success",
+          });
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  }
+
+
+
+
+</script>

@@ -1,0 +1,350 @@
+<!-- Page Header-->
+<header class="page-header">
+  <div class="container-fluid">
+    <h2 class="no-margin-bottom">Kelas</h2>
+  </div>
+</header>
+<!-- Dashboard Section-->
+<section class="dashboard-counts no-padding-bottom">
+  <div class="container-fluid">
+    <div class="row bg-white has-shadow">
+      <div class="col-xl-12 col-sm-12">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalScrollable" onclick="javascript:btnTambah();" id="btn-tambah"><i class="fa fa-plus fa-fw"></i> Tambah Data</button>
+
+        <div class="table-responsive">
+          Pilih Tahun Ajaran : <div id="thn"></div>
+          <table id="example" class="display table table-stipped table-bordered table-hover" style="width:100%">
+            <thead>
+              <tr>
+                <th>NO</th>
+                <th>Kode Kelas</th>
+                <th>Nama Kelas</th>
+                <th>NIS/NIP</th>
+                <th>Tahun Ajaran</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <th>NO</th>
+                <th>Kode Kelas</th>
+                <th>Nama Kelas</th>
+                <th>NIS/NIP</th>
+                <th>Tahun Ajaran</th>
+                <th>Aksi</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!------------------------------ Modal -------------------------------->
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalScrollableTitle">Modal title</h5>
+        <button type="button" id="close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-validate" id="submit">
+          <div class="form-group" id="input-id">
+            <label for="id" class="col-form-label">ID</label>
+            <input id="id" type="text" name="id" required data-msg="Please enter your id" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="kode" class="col-form-label">Kode Kelas</label>
+            <input id="kode" type="text" name="kode" required data-msg="Please enter your kode" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="nama_kelas" class="col-form-label">Nama Kelas</label>
+            <input id="nama_kelas" type="text" name="nama_kelas" required data-msg="Please enter your nama_kelas" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="no" class="col-form-label">NIS/NIP</label>
+            <input id="no" type="text" name="no" required data-msg="Please enter your no" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="status" class="col-form-label">Tahun Ajaran</label>
+            <select id="status" name="status" required class="form-control" onclick="">
+              <!-- <option id="aktif" value="aktif">Aktif</option> -->
+              <!-- <option id="nonaktif" value="nonaktif">Tidak Aktif</option> -->
+            </select>
+          </div>
+          <script>
+          myFunction();
+          function myFunction() {
+            var d = new Date();
+            var n = d.getFullYear();
+            let text = "";
+            for(let i = 2000; i <= n; i++){
+                // document.write("<p>Perulangan ke-" + i + "</p>")
+                text = text+`
+                              <option id="`+i+`-`+(i+1)+`-1" value="`+i+`-`+(i+1)+`-1">`+i+`/`+(i+1)+`-Ganjil</option>
+                              <option id="`+i+`-`+(i+1)+`-2" value="`+i+`-`+(i+1)+`-2">`+i+`/`+(i+1)+`-Genap</option>`;
+            };
+            document.getElementById("status").innerHTML = text;
+          }
+          </script>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" onclick="javascript:tambah();" id="btn-save">Save</button>
+        <button type="submit" class="btn btn-warning" onclick="javascript:edit();" id="btn-edit">Edit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!------------------ script --------------------->
+<script>
+  function btnEdit(id){
+    $.ajax({
+      url: url+'/api/data/kelas', //link json
+      type: 'GET',
+      dataType: 'json',
+      data: {
+          "id": id,
+      },
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          //include data dari database ke modals
+          $("#id").val(id);
+          $("#kode").val(result.data[0].kode);
+          $("#nama_kelas").val(result.data[0].nama_kelas);
+          $("#no").val(result.data[0].no);
+          $("#"+result.data[0].status).prop('selected','true');
+
+          //setting modals
+          $("#exampleModalScrollable").modal("show");
+          $("#input-id").removeClass("d-none");
+          $("#btn-edit").removeClass("d-none");
+          $("#btn-save").addClass("d-none");
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  }
+
+
+  function edit(){
+    var form = $("form")[0];
+    $.ajax({
+      url: url+'/api/data/edit_kelas', //link json
+      type: 'POST',
+      data: new FormData(form),
+      processData: false,
+      contentType: false,
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          $('#exampleModalScrollable').modal('hide');
+          $('body').removeAttr('style');
+          $('body').removeAttr('class');
+          $('.modal-backdrop').remove();
+          callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refresh page
+          swal({
+            title: "Sukses",
+            text: result.message,
+            icon: "success",
+          });
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  }
+
+
+
+
+
+
+  function hapus(id){
+    swal({
+      title: "Apa anda yakin?",
+      text: "data yang terhapus tidak dapat dikembalikan!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+
+        $.ajax({
+          url: url+'/api/data/del_kelas', //link json
+          type: 'POST',
+          dataType: 'json',
+          data: {
+              'id': id
+          },
+          success: function(result) {
+              console.log(result);
+              if (result.status == true){
+                swal(result.message, {
+                  icon: "success",
+                });
+                callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refresh data
+              }else{
+                swal("Error!", result.message , "error");
+              }
+          }
+        });
+      } else {
+        swal("Aksi dibatalkan!");
+      }
+    });
+  }
+
+
+
+
+
+  function btnTambah(){
+    $("#id").val("");
+    $("#kode").val(Math.ceil(Math.random()*9999999));
+    $("#nama_kelas").val("");
+    $("#no").val("");
+    //setting modals
+    $("#exampleModalScrollable").modal("show");
+    $("#btn-save").removeClass("d-none");
+    $("#btn-edit").addClass("d-none");
+    $("#input-id").addClass("d-none");
+  }
+
+
+
+
+
+
+  function tambah(){
+    var form = $("form")[0];
+    $.ajax({
+      url: url+'/api/data/kelas', //link json
+      type: 'POST',
+      dataType: 'json',
+      data: new FormData(form),
+      processData: false,
+      contentType: false,
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          $('#exampleModalScrollable').modal('hide');
+          $('body').removeAttr('style');
+          $('body').removeAttr('class');
+          $('.modal-backdrop').remove();
+          callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refesh page
+          swal({
+            title: "Sukses",
+            text: result.message,
+            icon: "success",
+          });
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  };
+
+
+
+
+
+
+  //jquery document ready
+   
+
+  $(document).ready(function() {
+    // datatables
+    var t =$('#example').DataTable({
+        orderCellsTop: true,
+        fixedHeader: true,
+        "stateSave": true,
+        "processing": true,
+        "ajax": {
+            "url": url+"/api/data/kelas",
+            "type": "GET",
+            "dataType": "json",
+        },
+        "order": [[ 1, 'asc' ]],
+        "columns": [{
+                "data": null,
+                "width": "50px",
+                "sClass": "text-center",
+                "orderable": false,
+            },
+            { "data": "kode" },
+            { "data": "nama_kelas" },
+            { "data": "no" },
+            { 
+              "data": "status",
+              "orderable": false, 
+              "mRender": function (data) {  
+                var ganti = data.replace('-', '/');
+                var ganti = ganti.slice(0, 10);
+                var res = data.slice(10);
+                if (res == 1) {
+                  return ganti+"Ganjil";
+                }else{
+                  return ganti+"Genap";
+                }
+              }
+            },
+            {
+              "data": "id",
+              "sClass": "text-center",
+              "orderable": false,
+              "mRender": function (data) {
+                  return '<a href="javascript:btnEdit('+ data +');" class="badge badge-info"><i class="fa fa-edit fa-fw"></i> Edit</a> \n\
+                  <a href="javascript:hapus('+ data +');" class="badge badge-danger"><i class="fa fa-trash fa-fw"></i> Delete</a>';
+              }
+            }
+        ],
+    } );
+    t.on( 'order.dt search.dt', function () {
+        t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            cell.innerHTML = i+1;
+        } );
+    } ).draw();
+
+    // Setup - add a text input to each footer cell
+    $('#example thead tr th').clone(true).appendTo( '#thn' ).each( function (i) {
+        var d = new Date();
+        var n = d.getFullYear();
+        let text = "<option id='' value=''>Semua</option>";
+        for(let i = 2000; i <= n; i++){
+            // document.write("<p>Perulangan ke-" + i + "</p>")
+            text = text+`
+                          <option value="`+i+`/`+(i+1)+`-Ganjil">`+i+`/`+(i+1)+`-Ganjil</option>
+                          <option value="`+i+`/`+(i+1)+`-Genap">`+i+`/`+(i+1)+`-Genap</option>
+                          `;
+        };
+        var title = $(this).text();
+        if (i == 4) {
+          $(this).html( `<select id="select_thn" class="form-control ml-1">`+text+`</select>` );
+        }else{
+          $(this).remove();
+        }
+ 
+        $( 'select', this ).on( 'keyup change', function () {
+            if ( t.column(i).search() !== this.value ) {
+                t
+                    .column(i)
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
+
+  });
+</script>

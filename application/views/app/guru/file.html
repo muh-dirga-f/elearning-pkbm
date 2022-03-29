@@ -1,0 +1,45 @@
+<br>
+<br>
+<div class="essay">
+	<div class="data">
+		<div class="alert alert-dark item p-3" role="alert" id="item0">
+			<div class="subitem" id="subitem0">
+				<div style="width: 25px;border: solid 1px black;border-radius: 50%;" class="text-center">1</div>
+				<div class="form-group pt-1">
+					<label for="soal0">Soal</label>
+					<textarea name="soal0" id="soal0" class="soal form-control" placeholder="Soal..." cols="100" rows="10"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<a href="#" name="save" class="save btn btn-success text-decoration-none"><span class="fa fa-save fa-fw"></span> simpan soal</a>
+</div>
+<script type="text/javascript">
+	$(".save").on("click", function(e) {
+		e.preventDefault();
+	    var judul = $('#judul-input').val();
+	    var waktu = $('#datetime-local-input').val(); 
+	    var batasWaktu = Math.floor(new Date(waktu).getTime()/1000); 
+		var soal = $("[name='soal0']").val();
+			$.ajax({
+				url: url+'/api/data/file', //link json
+			    type: 'POST',
+			    dataType: 'json',
+			    data: {
+			        "kelas": localStorage.getItem("kode_kelas"),
+			        "judul": judul,
+			        "batas": batasWaktu,
+			        "soal": soal
+				},
+				success: function(result){
+					console.log(result);
+			    	swal("Berhasil!", "Data tersimpan!" , "success");
+			    	callPage('tugas.html',localStorage.getItem("menu"));
+				},
+			    error: function(error){
+			      	console.log(error);
+			      	swal("Gagal", "Data Gagal disimpan!", "error");
+			    }
+			});
+	});
+</script>

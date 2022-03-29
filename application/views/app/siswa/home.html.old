@@ -1,0 +1,31 @@
+<!-- Page Header-->
+<header class="page-header">
+  <div class="container-fluid">
+    <h2 class="no-margin-bottom">Home</h2>
+  </div>
+</header>
+<!-- Dashboard Section-->
+<section class="dashboard-counts no-padding-bottom">
+  <div class="container-fluid">
+    <div class="row bg-white has-shadow">
+      <!-- <div class="col-xl-3 col-sm-6">
+        test
+      </div>
+      <div class="col-xl-3 col-sm-6">
+        test
+      </div>
+      <div class="col-xl-3 col-sm-6">
+        test
+      </div>
+      <div class="col-xl-3 col-sm-6">
+        test
+      </div> -->
+      <div class="col-xl-12 col-sm-12 text-center">
+        <div id="welcome"><br><br><br><br><br>Selamat datang <b>user</b><br><br><br><br><br></div> 
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  $('#welcome').html('<br><br><br><br><br>Selamat datang <b>'+localStorage.getItem("fullname")+'</b><br><br><br><br><br>');
+</script>

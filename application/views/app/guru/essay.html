@@ -1,0 +1,128 @@
+<br>
+<br>
+<div class="essay">
+	<div class="data">
+		<div class="alert alert-dark item p-3" role="alert" id="item0">
+			<div class="subitem" id="subitem0">
+				<div style="width: 25px;border: solid 1px black;border-radius: 50%;" class="text-center">1</div>
+				<div class="form-group pt-1">
+					<label for="soal0">Soal</label>
+					<textarea name="soal0" id="soal0" class="soal form-control" placeholder="Soal..." cols="100"></textarea>
+				</div>
+				<div class="form-group pt-1">
+					<label for="kunci0">Kunci Jawaban</label>
+					<textarea name="kunci0" id="kunci0" class="kunci form-control" placeholder="Kunci Jawaban..." cols="100"></textarea>
+				</div>
+				<div class="form-group pt-1">
+					<label for="bobot0">Bobot</label>
+					<input type="text" name="bobot0" id="bobot0" class="bobot form-control" placeholder="Bobot" value=""/>
+				</div>
+			</div>
+		</div>
+	</div>
+	<a href="#" name="add" class="add btn btn-primary text-decoration-none"><span class="fa fa-plus fa-fw"></span> tambah soal</a>
+	<a href="#" name="save" class="save btn btn-success text-decoration-none"><span class="fa fa-save fa-fw"></span> simpan soal</a>
+</div>
+<script type="text/javascript">
+	function getPos(){
+		var Pos=$(window).scrollTop();
+		return Pos;
+	}
+
+	var indexSoal = 0;
+
+	$('.add').on('click', function(e) {
+	    e.preventDefault();
+	    indexSoal++
+    	$('.remvSoal'+(indexSoal-1)).addClass('d-none');
+	    $('.data').append(`
+	    	<div class="alert alert-dark item p-3" role="alert" id="item`+ indexSoal +`">
+				<div class="subitem" id="subitem`+ indexSoal +`">
+			    	<a href="javascript:remvSoal(`+ indexSoal +`)" class="remvSoal`+ indexSoal +` text-decoration-none float-right"><h5><span class="badge badge-danger"> X </span></h5></a>
+					<div style="width: 25px;border: solid 1px black;border-radius: 50%;" class="text-center">`+ (indexSoal+1) +`</div>
+					<div class="form-group pt-1">
+						<label for="soal`+ indexSoal +`">Soal</label>
+						<textarea name="soal`+ indexSoal +`" id="`+ indexSoal +`" class="soal form-control" placeholder="Soal..." cols="100"></textarea>
+					</div>
+					<div class="form-group pt-1">
+						<label for="kunci`+ indexSoal +`">Kunci Jawaban</label>
+						<textarea name="kunci`+ indexSoal +`" id="kunci`+ indexSoal +`" class="kunci form-control" placeholder="Soal..." cols="100"></textarea>
+					</div>
+					<div class="form-group pt-1">
+						<label for="bobot`+ indexSoal +`">Bobot</label>
+						<input type="text" name="bobot`+ indexSoal +`" id="bobot`+ indexSoal +`" class="bobot form-control" value="">
+					</div>
+				</div>
+			</div>
+	    `);
+    	$('[name="soal'+ indexSoal +'"]').focus();
+    	var posisi = getPos();
+    	window.scrollTo(0, (posisi+288));
+	});
+
+	$(".save").on("click", function(e) {
+		e.preventDefault();
+	    var judul = $('#judul-input').val();
+	    var waktu = $('#datetime-local-input').val(); 
+	    var batasWaktu = Math.floor(new Date(waktu).getTime()/1000); 
+	    var cekDataKosong = false;
+		var hasilSoal = `{"data": [`;
+	    for (var i = 0; i < (indexSoal+1); i++) {
+			var soal = $("[name='soal"+ i +"']").val();
+			var kunci = $("[name='kunci"+ i +"']").val();
+			var bobot = $("[name='bobot"+ i +"']").val();
+			hasilSoal += `["`+soal+`","`+kunci+`",`+bobot+`]`;
+			if (indexSoal != i) {
+	            hasilSoal += `,`;
+	        }
+	        // validasi data
+	        if (soal == ""){
+	        	cekDataKosong = true;
+	        }
+	        if (kunci == ""){
+	        	cekDataKosong = true;
+	        }
+	        if (bobot == ""){
+	        	cekDataKosong = true;
+	        }
+		}
+		hasilSoal += `]}`;
+
+	    if (judul == '' || batasWaktu == '' || cekDataKosong == true) {
+	    	swal("Gagal!", "Lengkapi data inputan!" , "warning");
+		}else{
+			$.ajax({
+				url: url+'/api/data/essay', //link json
+			    type: 'POST',
+			    dataType: 'json',
+			    data: {
+			        "kelas": localStorage.getItem("kode_kelas"),
+			        "judul": judul,
+			        "batas": batasWaktu,
+			        "soal": hasilSoal
+					// "jawabanEssay": hasilSoal,
+				},
+				success: function(result){
+					console.log(result);
+			    	swal("Berhasil!", "Data tersimpan!" , "success");
+		    	callPage('tugas.html',localStorage.getItem("menu"));
+				},
+			    error: function(error){
+			      	console.log(error);
+			      	swal("Gagal", "Data Gagal disimpan!", "error");
+			    }
+			});			
+		}
+
+		// console.log(hasilSoal);
+	});
+
+
+    function remvSoal(index) {
+    	indexSoal--
+    	$('#item'+index).remove();
+    	$('.remvSoal'+(index-1)).removeClass('d-none');
+    	var posisi = getPos();
+    	window.scrollTo(0, (posisi-59));
+    }
+</script>

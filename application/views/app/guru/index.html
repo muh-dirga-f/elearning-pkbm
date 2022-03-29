@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>E-Learning</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/vendor/font-awesome/css/font-awesome.min.css">
+    <!-- Fontastic Custom icon font-->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/fontastic.css">
+    <!-- Google fonts - Poppins -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,700">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/style.default.css" id="theme-stylesheet">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>/assets/DataTables/datatables.min.css"/>
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>/assets/css/custom.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="<?php echo base_url(); ?>/assets/img/favicon.ico">
+
+    <!-- Bootstrap CSS-->
+    <!-- <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.min.css"> -->
+    <!-- Font Awesome CSS-->
+    <!-- <link rel="stylesheet" href="../assets/vendor/font-awesome/css/font-awesome.min.css"> -->
+    <!-- Fontastic Custom icon font-->
+    <!-- <link rel="stylesheet" href="../assets/css/fontastic.css"> -->
+    <!-- Google fonts - Poppins -->
+    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,700"> -->
+    <!-- theme stylesheet-->
+    <!-- <link rel="stylesheet" href="../assets/css/style.default.css" id="theme-stylesheet"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="../assets/DataTables/datatables.min.css"/> -->
+    <!-- Custom stylesheet - for your changes-->
+    <!-- <link rel="stylesheet" href="../assets/css/custom.css"> -->
+    <!-- Favicon-->
+    <!-- <link rel="shortcut icon" href="../assets/img/favicon.ico"> -->
+    
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+  </head>
+  <body>
+    <div class="page">
+      <!-- Main Navbar-->
+      <header class="header">
+        <nav class="navbar">
+          <div class="container-fluid">
+            <div class="navbar-holder d-flex align-items-center justify-content-between">
+              <!-- Navbar Header-->
+              <div class="navbar-header">
+                <!-- Navbar Brand --><a href="home.html" class="navbar-brand d-none d-sm-inline-block">
+                  <div class="brand-text d-none d-lg-inline-block"><span>E- </span><strong>Learning</strong></div>
+                  <div class="brand-text d-none d-sm-inline-block d-lg-none"><strong>BD</strong></div></a>
+                <!-- Toggle Button--><a id="toggle-btn" href="#" class="menu-btn active"><span></span><span></span><span></span></a>
+              </div>
+              <!-- Navbar Menu -->
+              <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
+                <!-- Logout    -->
+                <li class="nav-item">
+        					<a class="nav-link logout btn" onclick="logout()"> <span class="d-none d-sm-inline">Logout</span><i class="fa fa-sign-out"></i></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="page-content d-flex align-items-stretch"> 
+        <!-- Side Navbar -->
+        <nav class="side-navbar">
+          <!-- Sidebar Header-->
+          <div class="sidebar-header d-flex align-items-center">
+            <div class="avatar"><img src="<?php echo base_url(); ?>/assets/img/default-user.png" alt="..." class="img-fluid rounded-circle user_photo" style="width: 55px !important; height: 55px !important;"></div>
+            <!-- <div class="avatar"><img src="../assets/img/default-user.png" alt="..." class="img-fluid rounded-circle user_photo" style="width: 55px !important; height: 55px !important;"></div> -->
+            <div class="title">
+              <h1 class="h4" id="user">username</h1>
+              <p id="level">level</p>
+            </div>
+          </div>
+          <!-- Sidebar Navidation Menus--><span class="heading">Main Menu</span>
+          <ul class="list-unstyled hmenu">
+            <li id="menu-1"><a href="home.html"> <i class="icon-home"></i>Home </a></li>
+            <li id="menu-2"><a href="kelas.html"> <i class="icon-grid"></i>Data Kelas </a></li>
+            <li id="menu-3"><a href="materi.html"> <i class="icon-grid"></i>Data Materi </a></li>
+        </nav>
+        <div class="content-inner">
+          <div id="content">
+            <form class="form-validate" id="submit"></form>
+          </div>
+
+          <!-- Page Footer-->
+          <footer class="main-footer">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-sm-6">
+                  <p>Muh. Dirga F &copy; 2019</p>
+                </div>
+                <div class="col-sm-6 text-right">
+                  <p>Design by <a href="https://bootstrapious.com/p/admin-template" class="external">Bootstrapious</a></p>
+                  <!-- Please do not remove the backlink to us unless you support further theme's development at https://bootstrapious.com/donate. It is part of the license conditions. Thank you for understanding :)-->
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+    <script src="<?php echo base_url(); ?>/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="<?php echo base_url(); ?>/assets/vendor/popper.js/umd/popper.min.js"> </script>
+    <script src="<?php echo base_url(); ?>/assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="<?php echo base_url(); ?>/assets/vendor/jquery.cookie/jquery.cookie.js"> </script>
+    <!-- <script src="<?php echo base_url(); ?>/assets/vendor/chart.js/Chart.min.js"></script> -->
+    <script src="<?php echo base_url(); ?>/assets/vendor/jquery-validation/jquery.validate.min.js"></script>
+    <!-- <script src="<?php echo base_url(); ?>/assets/js/charts-home.js"></script> -->
+    <script type="text/javascript" src="<?php echo base_url(); ?>/assets/DataTables/datatables.min.js"></script>
+    <script src="<?php echo base_url(); ?>/assets/js/sweetalert.min.js"></script> 
+    <!-- Main File-->
+    <script src="<?php echo base_url(); ?>/assets/js/front.js"></script>
+  	<script src="<?php echo base_url(); ?>/assets/js/login.js"></script>
+    <script src="<?php echo base_url(); ?>/assets/js/config.js"></script>
+    <script src="<?php echo base_url(); ?>/assets/js/callpage.js"></script>
+    <script src="<?php echo base_url(); ?>/assets/js/timeConverter.js"></script>
+
+    <!-- <script src="../assets/vendor/jquery/jquery.min.js"></script> -->
+    <!-- <script src="../assets/vendor/popper.js/umd/popper.min.js"> </script> -->
+    <!-- <script src="../assets/vendor/bootstrap/js/bootstrap.min.js"></script> -->
+    <!-- <script src="../assets/vendor/jquery.cookie/jquery.cookie.js"> </script> -->
+      <!-- <script src="../assets/vendor/chart.js/Chart.min.js"></script> -->
+    <!-- <script src="../assets/vendor/jquery-validation/jquery.validate.min.js"></script> -->
+      <!-- <script src="../assets/js/charts-home.js"></script> -->
+    <!-- <script type="text/javascript" src="../assets/DataTables/datatables.min.js"></script> -->
+    <!-- <script src="../assets/js/sweetalert.min.js"></script>  -->
+    <!-- Main File-->
+    <!-- <script src="../assets/js/front.js"></script> -->
+    <!-- <script src="../assets/js/login.js"></script> -->
+    <!-- <script src="../assets/js/config.js"></script> -->
+    <!-- <script src="../assets/js/callpage.js"></script> -->
+    <!-- <script src="../assets/js/timeConverter.js"></script> -->
+  </body>
+</html>
+<script>
+if(localStorage.getItem("user_photo") != '') {
+  $('.avatar .user_photo').attr('src',url+'/upload/'+localStorage.getItem("user_photo"));
+}
+
+$(document).ready(function() {
+  //pemanggilan isi menu dan set menu aktif
+  $('.hmenu a').on('click', function(e){  
+    e.preventDefault( );
+    var pageRef = $(this).attr('href');
+    var menu = $(this).parents("li").attr('id');
+    callPage(pageRef,menu)
+  });
+
+	cekLogin('guru');
+  callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));
+  var namaUser = localStorage.getItem("fullname").charAt(0).toUpperCase() + localStorage.getItem("fullname").slice(1);
+  $('#user').html(namaUser);
+  $('#level').html(localStorage.getItem("level"));
+});
+</script>

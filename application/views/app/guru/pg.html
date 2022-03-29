@@ -1,0 +1,176 @@
+				<br>
+				<br>
+				<input type="text" name="tipe" value="PG" hidden="true">
+				<div class="pg">
+					<div class="data">
+						<div class="alert alert-dark item p-3" role="alert" id="item0">
+							<div class="subitem" id="subitem0">
+								<div style="width: 25px;border: solid 1px black;border-radius: 50%;" class="text-center">1</div>
+								<div class="form-group pt-1">
+									<textarea name="soal0" class="soal form-control" placeholder="Soal..." cols="100"></textarea>
+								</div>
+								<div class="form-check form-check-inline pb-2">
+									<input type="radio" name="kunci0" class="answer form-check-input" value="0">
+									<textarea name="jawab0" class="jawab form-control" placeholder="Jawaban..." rows="1" cols="50"></textarea>
+								</div><br>
+								<div class="form-check form-check-inline pb-2">
+									<input type="radio" name="kunci0" class="answer form-check-input" value="1">
+									<textarea name="jawab0" class="jawab form-control" placeholder="Jawaban..." rows="1" cols="50"></textarea>
+								</div>
+							</div>
+							<a href="javascript:addJawaban(0)" class="addJawaban btn btn-info text-decoration-none"><span class="fa fa-plus fa-fw"></span> tambah jawaban</a>
+						</div>
+					</div>
+					<a href="#" name="add" class="add btn btn-primary text-decoration-none"><span class="fa fa-plus fa-fw"></span> tambah soal</a>
+					<a href="#" name="save" class="save btn btn-success text-decoration-none"><span class="fa fa-save fa-fw"></span> simpan soal</a>
+				</div>
+
+
+
+<!-- tipe soal : pg -->
+<script type="text/javascript">
+	function getPos(){
+		var Pos=$(window).scrollTop();
+		return Pos;
+	}
+
+    var indexSoal = 0;
+    $('.add').on('click', function(e) {
+	    e.preventDefault();
+	    indexSoal++
+    	$('.remvSoal'+(indexSoal-1)).addClass('d-none');
+	    $('.data').append(`
+	    	<div class="alert alert-dark item p-3" role="alert" id="item`+ indexSoal +`">
+				<div class="subitem" id="subitem`+ indexSoal +`">
+			    	<a href="javascript:remvSoal(`+ indexSoal +`)" class="remvSoal`+ indexSoal +` text-decoration-none float-right"><h5><span class="badge badge-danger"> X </span></h5></a>
+					<div style="width: 25px;border: solid 1px black;border-radius: 50%;" class="text-center">`+ (indexSoal+1) +`</div>
+					<div class="form-group pt-1">
+						<textarea name="soal`+ indexSoal +`" class="soal form-control" placeholder="Soal..." cols="100"></textarea>
+					</div>
+					<div class="form-check form-check-inline pb-2">
+						<input type="radio" name="kunci`+ indexSoal +`" class="answer form-check-input" value="0">
+						<textarea name="jawab`+ indexSoal +`" class="jawab form-control" placeholder="Jawaban..." rows="1" cols="50"></textarea>
+					</div><br>
+					<div class="form-check form-check-inline pb-2">
+						<input type="radio" name="kunci`+ indexSoal +`" class="answer form-check-input" value="1">
+						<textarea name="jawab`+ indexSoal +`" class="jawab form-control" placeholder="Jawaban..." rows="1" cols="50"></textarea>
+					</div>
+				</div>
+				<a href="javascript:addJawaban(`+ indexSoal +`)" class="addJawaban btn btn-info text-decoration-none"><span class="fa fa-plus fa-fw"></span> tambah jawaban</a>
+			</div>
+	    `);
+    	$('[name="soal'+ indexSoal +'"]').focus();
+    	var posisi = getPos();
+    	window.scrollTo(0, (posisi+288));
+	});
+
+
+
+    $('.save').on('click', function(e) {
+	    e.preventDefault();
+	    console.clear()
+	    var judul = $('#judul-input').val();
+	    var waktu = $('#datetime-local-input').val(); 
+	    var batasWaktu = Math.floor(new Date(waktu).getTime()/1000); 
+	    var cekDataKosong = false;
+	    var hasilSoal = "[";
+	    for (var i = 0; i < (indexSoal+1); i++) {
+	    	var soal = $("[name='soal"+ i +"']").val();
+	    	var jawab = $("[name='jawab"+ i +"']");
+		    	var jawaban = "";
+		    	for (var index = 0; index < jawab.length; index++) {
+		    		jawaban += `"`+jawab[index].value+`"`;
+		    		//cek isi value jawaban
+		    		if (jawab[index].value == '') {
+			            cekDataKosong = true;
+			        }
+			        //memberi koma untuk memisah jawaban
+			        if ((jawab.length - 1) != index) {
+			            jawaban += `,`;
+			        }
+		    	}
+	    	var kunci = $("[name='kunci"+ i +"']:checked").val();
+
+	    	//cek data kosong untuk validasi
+	    	if (soal == '') {
+	            cekDataKosong = true;
+	        }
+
+	        if (typeof kunci === 'undefined'){
+	            cekDataKosong = true;
+	        }
+
+	    	// console.log(soal)
+		    // console.log(jawaban)
+	    	// console.log(kunci)
+	    	hasilSoal += `{"question": "`+ soal +`","choices": [`+ jawaban +`],"correctAnswer": `+kunci+`}`;
+	    	if (indexSoal != i) {
+	            hasilSoal += `,`;
+	        }
+	    }
+	    hasilSoal += "]";
+	    
+	    //cek hasilSoal berbentuk array json
+	    console.log('judul = '+judul);
+	    console.log('batasWaktu = '+batasWaktu);
+	    console.log('hasilSoal = '+hasilSoal);
+	    //validasi data array json
+	    if (judul == '' || batasWaktu == '' || cekDataKosong == true) {
+	    	// console.log('lengkapi data');
+	    	swal("Gagal!", "Lengkapi data inputan!" , "warning");
+	    }else{
+	    	$.ajax({
+		      url: url+'/api/data/pg', //link json
+		      type: 'POST',
+		      dataType: 'json',
+		      data: {
+		          "kelas": localStorage.getItem("kode_kelas"),
+		          "judul": judul,
+		          "batas": batasWaktu,
+		          "soal": hasilSoal
+		      },
+		      success: function(result) {
+		        console.log(result);
+		    	swal("Berhasil!", "Data tersimpan!" , "success");
+		    	callPage('tugas.html',localStorage.getItem("menu"));
+		      },
+		      error: function(error){
+		      	console.log(error);
+		      	swal("Gagal", "Data Gagal disimpan!", "error");
+		      }
+	    	});
+	    	// console.log('tersimpan');
+	    }
+	});
+
+
+    function addJawaban(index) {
+    	var jumlahBaris = $('[name="kunci'+index+'"]');
+    	$('.remvJawaban'+index+(jumlahBaris.length-1)).addClass('d-none');
+    	$('#subitem'+index).append(`
+    		<div id="jid`+ index + jumlahBaris.length +`">
+				<div class="form-check form-check-inline pb-2">
+					<input type="radio" name="kunci`+ index +`" class="answer form-check-input" value="`+ jumlahBaris.length +`">
+					<textarea name="jawab`+ index +`" class="jawab form-control" placeholder="Jawaban..." rows="1" cols="50"></textarea>
+				</div>
+        			<a href="javascript:remvJawaban(`+ index +`,`+ jumlahBaris.length +`)" class="remvJawaban`+ index + jumlahBaris.length +` text-decoration-none"><span class="badge badge-pill badge-warning">X</span></a>
+    		</div>
+    		`);
+    	$('[name="jawab'+ index +'"]')[jumlahBaris.length].focus();
+    }
+
+
+    function remvJawaban(index,value) {
+    	$('#jid'+index+value).remove();
+    	$('.remvJawaban'+index+(value-1)).removeClass('d-none');
+    }
+
+
+    function remvSoal(index) {
+    	indexSoal--
+    	$('#item'+index).remove();
+    	$('.remvSoal'+(index-1)).removeClass('d-none');
+    	var posisi = getPos();
+    	window.scrollTo(0, (posisi-59));
+    }
+</script>

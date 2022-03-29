@@ -1,0 +1,154 @@
+<!-- Page Header-->
+<header class="page-header">
+  <div class="container-fluid">
+    <h2 class="no-margin-bottom judul-tugas">Tugas</h2>
+  </div>
+</header>
+<!-- Dashboard Section-->
+<form>
+<section class="dashboard-counts no-padding-bottom">
+  <div class="container-fluid">
+    <div class="row bg-white has-shadow">
+      <div class="col-xl-12 col-sm-12">
+        <div class='container'>
+            <div id='quiz'>
+              <input type="file" name="file" id="file" hidden="true"/>
+            </div>
+            <input type="text" name="id_tugas" id="id_tugas" value="" hidden="true"><br>
+            <input type="text" name="tanggal" id="tanggal" value="" hidden="true"><br>
+            <input type="text" name="nis" id="nis" value="" hidden="true"><br>
+            <div id="tes"></div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <button type="button" class="btn btn-secondary" onclick="javascript:btnBack();"><i class="fa fa-arrow-left fa-fw"></i> Kembali</button>
+      </div>
+    </div>
+  </div>
+</section>
+</form>
+
+<!--------------- script ----------------->
+<script type="text/javascript">
+  function btnBack() {
+    callPage("tugas_terkumpul.html", localStorage.getItem("menu"));
+  }
+</script>
+
+<script type="text/javascript">
+        $('.judul-tugas').text(localStorage.getItem("judul_tugas_siswa"));
+        console.log(localStorage.getItem("id_tugas"));
+        console.log(localStorage.getItem("nis"));
+(function() {
+  $('#id_tugas').val(localStorage.getItem("id_tugas"));
+  $('#tanggal').val(Math.floor(new Date().getTime()/1000));
+  $('#nis').val(localStorage.getItem("nis"));
+  /////// cek jawaban dari db
+  var jawabanDB = [];
+  var questions = [];
+
+  ///////////// load jawaban /////////////////
+  $.ajax({
+      url: url+'/api/data/jawaban_tersimpan', //link json
+      type: 'GET',
+      dataType: 'json',
+      data: {
+        "id_tugas": localStorage.getItem("id_tugas"),//id dari soal yg akan di buka
+        // "id": localStorage.getItem("id_soal"),//id dari soal yg akan di buka
+        "nis": localStorage.getItem("nis")
+      },
+      success: function(result) {
+        // console.log(result);
+        if(result.status == true){
+          if(result.data[0]['jawaban']){
+            var j = (result.data[0]['jawaban']);
+            jawabanDB = j;
+            $('#save').remove();
+          }
+          // console.log(jawabanDB);
+
+          ///////////// load soal /////////////////
+          $.ajax({
+              url: url+'/api/data/soal', //link json
+              type: 'GET',
+              dataType: 'json',
+              data: {
+                "id": localStorage.getItem("id_tugas"),//id dari soal yg akan di buka
+                // "id": localStorage.getItem("id_soal"),//id dari soal yg akan di buka
+              },
+              success: function(result) {
+                console.log(result);
+                var q = (result.data[0]['soal']);
+                questions = q;
+                // console.log(questions);
+                displayQuestions();
+              },
+
+          })
+        }
+
+      },
+
+  })
+
+
+  
+
+  function displayQuestions(){
+    // for (var index = 0; index < questions.data.length; index++) {
+      // console.log(questions.data[index][0]);
+      var index = 0;
+      var qElement = $('<div>', {
+        id: 'question'
+      });
+      
+      var question = $('<p>').append((index + 1)+'. '+(questions.replace(/\n/g,"<br>")));
+      qElement.append(question);
+
+      if((jawabanDB) != ''){
+        var answer = '<a href="'+url+'/upload/tugas/'+jawabanDB+'">'+jawabanDB+'</a>';
+      }else{
+        var answer = '<span class="border border-danger p-1">tugas belum dikumpul!</span>';
+      }
+
+      qElement.append(answer);
+      $("#quiz").html(qElement).append("<br>").fadeIn();
+    // }
+  }
+
+
+  // Click handler for the 'save' button
+  $('#save').on('click', function (e) {
+    e.preventDefault();
+    var form = $("form")[0];
+    console.log(form)
+    var file = $('#file').val();
+    if(file != ''){
+      $.ajax({
+        url: url+"/api/data/jawabFile",
+        type: "POST",
+        dataType: "json",
+        data: new FormData(form),
+        processData: false,
+        contentType: false,
+        success: function(result) {
+        //   console.log(result);
+          if (result.status == true){
+            console.log(result.message);
+            swal ("Berhasil!", result.message, "success");
+          }else{
+            console.log(result.message);
+            swal ("Gagal!", result.message, "error");
+          }
+        }
+      });
+    }else{
+      alert('upload jawaban terlebih dahulu');
+    }
+    
+  });
+
+
+})();
+</script>

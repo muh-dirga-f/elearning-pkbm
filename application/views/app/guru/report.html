@@ -1,0 +1,143 @@
+<!-- Page Header-->
+<header class="page-header">
+	<div class="container-fluid">
+		<h2 class="no-margin-bottom">Report Nilai</h2>
+	</div>
+</header>
+<!-- Dashboard Section -->
+<section class="dashboard-counts no-padding-bottom">
+
+	<div class="container-fluid">
+		<div class="row bg-white has-shadow">
+			<div class="col-xl-12 col-sm-12">
+				<!-- Button trigger modal -->
+				<div class="table-responsive">
+					<table id="demotable" class="display table table-stipped table-bordered table-hover dataTable">
+				        <thead><tr></tr></thead>
+				    </table>
+				</div>
+
+
+			    <script>
+			        var data,
+			                tableName= '#demotable',
+			                columns,
+			                str,
+			                jqxhr = $.ajax({
+							url: url + "/api/data/report_nilai",
+							type: "GET",
+							dataType: "json",
+					        data: {
+					          "kd_kelas": localStorage.getItem("kode_kelas")
+					        }
+
+						})
+			                        .done(function () {
+			                            data = JSON.parse(jqxhr.responseText);
+			                            console.log(data)
+			                // Iterate each column and print table headers for Datatables
+			                $.each(data.columns, function (k, colObj) {
+			                    str = '<th>' + colObj.data + '</th>';
+			                    $(str).appendTo(tableName+'>thead>tr');
+			                // console.log(colObj.data)
+			                });
+			                // Add some Render transformations to Columns
+			                // Not a good practice to add any of this in API/ Json side
+			                data.columns[0].render = function (data, type, row) {
+			                    return data;
+			                }
+			                        // Debug? console.log(data.columns[0]);
+			                $(tableName).dataTable({
+			                	"dom": 'Bfrtip',
+						        "buttons": [
+						            {
+						                extend:    'copyHtml5',
+						                text:      '<i class="fa fa-files-o"></i>',
+						                titleAttr: 'Copy',
+						                messageTop: localStorage.getItem("nama_kelas"),
+										messageBottom: 'Nama Guru : ' + localStorage.getItem("fullname"),
+						                attr: {
+						                	// class: 'btn btn-info'
+						                	class: 'btn btn-warning'
+						                }
+						            },
+						            {
+						                extend:    'excelHtml5',
+						                text:      '<i class="fa fa-file-excel-o"></i>',
+						                titleAttr: 'Excel',
+						                messageTop: localStorage.getItem("nama_kelas"),
+										messageBottom: 'Nama Guru : ' + localStorage.getItem("fullname"),
+						                attr: {
+						                	class: 'btn btn-success'
+						                }
+						            },
+						            {
+						                extend:    'csvHtml5',
+						                text:      '<i class="fa fa-file-text-o"></i>',
+						                titleAttr: 'CSV',
+						                messageTop: localStorage.getItem("nama_kelas"),
+										messageBottom: 'Nama Guru : ' + localStorage.getItem("fullname"),
+						                attr: {
+						                	class: 'btn btn-primary'
+						                }
+						            },
+						            {
+						                extend:    'pdfHtml5',
+						                text:      '<i class="fa fa-file-pdf-o"></i>',
+						                titleAttr: 'PDF',
+						                messageTop: localStorage.getItem("nama_kelas"),
+										messageBottom: 'Nama Guru : ' + localStorage.getItem("fullname"),
+						                attr: {
+						                	class: 'btn btn-danger'
+						                },
+						                orientation: 'landscape',
+						                pageSize: 'A4'
+						            },
+						            // {
+						            //     extend: 'print',
+						            //     text: '<i class="fa fa-print"></i>',
+						            //     titleAttr: 'Print',
+						            //     messageTop: localStorage.getItem("nama_kelas"),
+						            //     attr: {
+						            //     	class: 'btn btn-warning'
+						            //     }
+						            // },
+						        ],
+			                    "data": data.data,
+			                    "columns": data.columns,
+			                    "fnInitComplete": function () {
+			                        // Event handler to be fired when rendering is complete (Turn off Loading gif for example)
+			                        console.log('Datatable rendering complete');
+			                    }
+			                });
+			            })
+			            .fail(function (jqXHR, exception) {
+			                            var msg = '';
+			                            if (jqXHR.status === 0) {
+			                                msg = 'Not connect.\n Verify Network.';
+			                            } else if (jqXHR.status == 404) {
+			                                msg = 'Requested page not found. [404]';
+			                            } else if (jqXHR.status == 500) {
+			                                msg = 'Internal Server Error [500].';
+			                            } else if (exception === 'parsererror') {
+			                                msg = 'Requested JSON parse failed.';
+			                            } else if (exception === 'timeout') {
+			                                msg = 'Time out error.';
+			                            } else if (exception === 'abort') {
+			                                msg = 'Ajax request aborted.';
+			                            } else {
+			                                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+			                            }
+			                console.log(msg);
+			            });
+			    </script>
+			    <button type="button" class="btn btn-secondary" onclick="javascript:btnBack();"><i class="fa fa-arrow-left fa-fw"></i> Kembali</button>
+			</div>
+		</div>
+	</div>
+</section>
+<script>
+	function btnBack() {
+		callPage("tugas.html", localStorage.getItem("menu"));
+	}
+</script>

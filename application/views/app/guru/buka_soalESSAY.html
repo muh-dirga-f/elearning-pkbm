@@ -1,0 +1,196 @@
+<!-- Page Header-->
+<header class="page-header">
+  <div class="container-fluid">
+    <h2 class="no-margin-bottom judul-tugas">Tugas</h2>
+  </div>
+</header>
+<!-- Dashboard Section-->
+<section class="dashboard-counts no-padding-bottom">
+  <div class="container-fluid">
+    <div class="row bg-white has-shadow">
+      <div class="col-xl-12 col-sm-12">
+        <div class='container'>
+            <div id='quiz'></div>
+            <div id="tes"></div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <button type="button" class="btn btn-secondary" onclick="javascript:btnBack();"><i class="fa fa-arrow-left fa-fw"></i> Kembali</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--------------- script ----------------->
+<script type="text/javascript">
+  function btnBack() {
+    callPage("tugas_terkumpul.html", localStorage.getItem("menu"));
+  }
+</script>
+
+<script type="text/javascript">
+        $('.judul-tugas').text(localStorage.getItem("judul_tugas_siswa"));
+        console.log(localStorage.getItem("id_tugas"));
+        console.log(localStorage.getItem("nis"));
+(function() {
+
+  /////// cek jawaban dari db
+  var jawabanDB = [];
+  var questions = [];
+
+  ///////////// load jawaban /////////////////
+  $.ajax({
+      url: url+'/api/data/jawaban_tersimpan', //link json
+      type: 'GET',
+      dataType: 'json',
+      data: {
+        "id_tugas": localStorage.getItem("id_tugas"),//id dari soal yg akan di buka
+        // "id": localStorage.getItem("id_soal"),//id dari soal yg akan di buka
+        "nis": localStorage.getItem("nis")
+      },
+      success: function(result) {
+        // console.log(result);
+        if(result.status == true){
+          if(result.data[0]['jawaban']){
+            var j = JSON.parse(result.data[0]['jawaban']);
+            jawabanDB = j;
+          }
+          // console.log(jawabanDB);
+
+          ///////////// load soal /////////////////
+          $.ajax({
+              url: url+'/api/data/soal_guru', //link json
+              type: 'GET',
+              dataType: 'json',
+              data: {
+                "id": localStorage.getItem("id_tugas"),//id dari soal yg akan di buka
+                // "id": localStorage.getItem("id_soal"),//id dari soal yg akan di buka
+              },
+              success: function(result) {
+                // console.log(result);
+                var q = JSON.parse(result.data[0]['soal']);
+                questions = q;
+                console.log(questions);
+                displayQuestions();
+              },
+
+          })
+        }
+
+      },
+
+  })
+
+
+  
+
+  function displayQuestions(){
+    for (var index = 0; index < questions.data.length; index++) {
+      // console.log(questions.data[index][0]);
+      var qElement = $('<div>', {
+        id: 'question'
+      });
+      
+      var question = $('<p>').append((index + 1)+'. '+(questions.data[index][0]));
+      qElement.append(question);
+
+      if($.isArray(jawabanDB['jawaban'])){
+        var answer = 'Jawaban Siswa :<br><textarea name="a'+ (index+1) +'" class="answer form-control" rows="4" cols="100" placeholder="Jawaban no '+ (index+1) +'">'+jawabanDB['jawaban'][index][0]+'</textarea>';
+      }else{
+        var answer = '<textarea name="a'+ (index+1) +'" class="answer form-control" rows="4" cols="100" placeholder="Jawaban no '+ (index+1) +'"></textarea>';
+      }
+
+      answer += 'Kunci Jawaban :<br><div class="border border-info px-3 py-1">'+questions.data[index][1]+'</div>'
+
+      qElement.append(answer);
+      $("#quiz").append(qElement).append("<br>").fadeIn();
+    }
+  }
+
+
+  // Click handler for the 'save' button
+  $('#save').on('click', function (e) {
+    e.preventDefault();
+    var tanggal = Math.floor(new Date().getTime()/1000);
+    var answer = `{"data":[`;
+    for (let index = 0; index < questions.data.length; index++) {
+        // var ans = questions.data[index][1];
+        var ans = $("[name='a"+(index+1)+"']").val();
+        // var max = questions.data[index][2];
+        // console.log(ans); //kunci jawaban
+        // console.log(wer);//jawaban dari siswa
+        //perhatikan ganti kutip dua (") menjadi (') apabila error
+        answer += `["` + ans + `"]`;
+        //memberi koma antar obj
+        if ((questions.data.length - 1) != index) {
+            answer += `,`;
+        }
+    }
+    answer += `]}`;
+    console.log(answer);
+
+    $.ajax({
+      url: url+"/api/data/jawabEssay",
+      type: "GET",
+      dataType: "json",
+      data: {
+        "id_tugas": localStorage.getItem("id_tugas"),//id dari soal yg akan di buka
+        // "id": localStorage.getItem("id_soal"),//id dari soal yg akan di buka
+        "tanggal": tanggal,
+        "nis": localStorage.getItem("nis"),
+        "jawabanEssay": answer
+      },
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          console.log(result.message);
+          swal ("Berhasil!", result.message, "success");
+        }else{
+          console.log(result.message);
+          swal ("Gagal!", result.message, "error");
+        }
+      }
+    });
+
+    // if (questions.length == ans.length){
+    //   // console.clear();
+    //   var fixHasil = (hasil/questions.length*100);
+    //   var tanggal = Math.floor(new Date().getTime()/1000);
+    //   // console.log("cek array var test = '"+JSON.parse(test)+"'")
+    //   console.log(ans)
+    //   // console.log(tanggal)
+    //   console.log("cek array var answer= '"+answer+"'")
+    //   // console.log("hasil = "+fixHasil)
+    //   $.ajax({
+    //       url: url+'/api/data/soal2', //link json
+    //       type: 'POST',
+    //       dataType: 'json',
+    //       data: {
+    //           "id_tugas": localStorage.getItem("id_tugas"),//id dari soal yg akan di buka
+    //           // "id": localStorage.getItem("id_soal"),//id dari soal yg akan di buka
+    //           "jawaban": answer,
+    //           "tanggal": tanggal,
+    //           "nis": localStorage.getItem("nis"),
+    //           "nilai": fixHasil
+    //       },
+    //       success: function(result) {
+    //         console.log(result);
+    //         if (result.status == true){
+    //           console.log(result.message);
+    //           swal ("Berhasil!", result.message, "success")
+    //         }else{
+    //           console.log(result.message);
+    //           swal ("Gagal!", result.message, "error")
+    //         }
+    //       }
+    //   });
+    // }else{
+    //   alert("lengkapi jawaban terlebih dahulu")
+    // }
+    
+  });
+
+
+})();
+</script>

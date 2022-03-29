@@ -1,0 +1,343 @@
+<!-- Page Header-->
+<header class="page-header">
+  <div class="container-fluid">
+    <h2 class="no-margin-bottom">User</h2>
+  </div>
+</header>
+<!-- Dashboard Section-->
+<section class="dashboard-counts no-padding-bottom">
+  <div class="container-fluid">
+    <div class="row bg-white has-shadow">
+      <div class="col-xl-12 col-sm-12">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalScrollable" onclick="javascript:btnTambah();" id="btn-tambah"><i class="fa fa-plus fa-fw"></i> Tambah Data</button>
+
+        <div class="table-responsive">
+          <table id="example" class="display table table-stipped table-bordered table-hover" style="width:100%">
+            <thead>
+              <tr>
+                <th>NO</th>
+                <th>NIS/NIP</th>
+                <th>Username</th>
+                <th>Nama Lengkap</th>
+                <!-- <th>Email</th> -->
+                <th>Password</th>
+                <th>Level</th>
+                <th>Foto</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <th>NO</th>
+                <th>NIS/NIP</th>
+                <th>Username</th>
+                <th>Nama Lengkap</th>
+                <!-- <th>Email</th> -->
+                <th>Password</th>
+                <th>Level</th>
+                <th>Foto</th>
+                <th>Aksi</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!------------------------------ Modal -------------------------------->
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalScrollableTitle">Modal title</h5>
+        <button type="button" id="close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-validate" id="submit">
+          <div class="form-group" id="input-id">
+            <label for="id" class="col-form-label">ID</label>
+            <input id="id" type="text" name="id" required data-msg="Please enter your id" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="fullname" class="col-form-label">Nama Lengkap</label>
+            <input id="fullname" type="text" name="fullname" required data-msg="Please enter your fullname" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="email" class="col-form-label">Email</label>
+            <input id="email" type="email" name="email" required data-msg="Please enter a valid email address" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="username" class="col-form-label">Username</label>
+            <input id="username" type="text" name="user" required data-msg="Please enter your username" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="password" class="col-form-label">Password</label>
+            <input id="password" type="text" name="pass" required data-msg="Please enter your password" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="no" class="col-form-label">NIS/NIP</label>
+            <input id="no" type="text" name="no" required data-msg="Please enter your NIS/NIP" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="level" class="col-form-label">Status</label>
+            <select id="level" name="level" required class="form-control">
+              <option id="siswa" value="siswa">Siswa</option>
+              <option id="guru" value="guru">Guru</option>
+              <option id="admin" value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="level" class="col-form-label">Foto</label>
+            <div class="text-center" id="photo_img"></div>
+            <div class="custom-file">
+              <input type="file" class="form-control" name="photo" id="photo">
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" onclick="javascript:tambah();" id="btn-save">Save</button>
+        <button type="submit" class="btn btn-warning" onclick="javascript:edit();" id="btn-edit">Edit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!------------------ script --------------------->
+<script>
+  function btnEdit(id){
+    $.ajax({
+      url: url+'/api/data/users', //link json
+      type: 'GET',
+      dataType: 'json',
+      data: {
+          "id": id,
+      },
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          //include data dari database ke modals
+          $("#id").val(id);
+          $("#fullname").val(result.data[0].fullname);
+          $("#email").val(result.data[0].email);
+          $("#username").val(result.data[0].user);
+          $("#password").val(result.data[0].pass);
+          $("#no").val(result.data[0].no);
+          $("#"+result.data[0].level).prop('selected','true');
+          $("#photo_value").val(result.data[0].photo);
+          if (result.data[0].photo !== ""){
+            $("#photo_img").html("<a href='"+url+"/upload/"+result.data[0].photo+"' target='new_windows'><img src='"+url+"/upload/"+result.data[0].photo+"' width='150px'/></a><br/><br/>");
+          }else{
+            $("#photo_img").html("");
+          }
+
+          //setting modals
+          $("#exampleModalScrollable").modal("show");
+          $("#input-id").removeClass("d-none");
+          $("#btn-edit").removeClass("d-none");
+          $("#btn-save").addClass("d-none");
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  }
+
+
+  function edit(){
+    var form = $("form")[0];
+    $.ajax({
+      url: url+'/api/data/edit_users', //link json
+      type: 'POST',
+      data: new FormData(form),
+      processData: false,
+      contentType: false,
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          $('#exampleModalScrollable').modal('hide');
+          $('body').removeAttr('style');
+          $('body').removeAttr('class');
+          $('.modal-backdrop').remove();
+          callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refresh page
+          swal({
+            title: "Sukses",
+            text: result.message,
+            icon: "success",
+          });
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  }
+
+
+
+
+
+
+  function hapus(id){
+    swal({
+      title: "Apa anda yakin?",
+      text: "data yang terhapus tidak dapat dikembalikan!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+
+        $.ajax({
+          url: url+'/api/data/del_users', //link json
+          type: 'POST',
+          dataType: 'json',
+          data: {
+              'id': id
+          },
+          success: function(result) {
+              console.log(result);
+              if (result.status == true){
+                swal(result.message, {
+                  icon: "success",
+                });
+                callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refresh data
+              }else{
+                swal("Error!", result.message , "error");
+              }
+          }
+        });
+      } else {
+        swal("Aksi dibatalkan!");
+      }
+    });
+  }
+
+
+
+
+
+  function btnTambah(){    
+    $("#fullname").val("");
+    $("#email").val("");
+    $("#username").val("");
+    $("#password").val("");
+    $("#no").val("");
+    $("#level").val("");
+    //setting modals
+    $("#exampleModalScrollable").modal("show");
+    $("#btn-save").removeClass("d-none");
+    $("#btn-edit").addClass("d-none");
+    $("#input-id").addClass("d-none");
+  }
+
+
+
+
+
+
+  function tambah(){
+    var form = $("form")[0];
+    var fullname = $("#fullname").val();
+    var email = $("#email").val();
+    var user = $("#username").val();
+    var pass = $("#password").val();
+    var no = $("#no").val();
+
+    if(fullname != '' && email != '' && user != '' && pass != '' && no != ''){
+      $.ajax({
+        url: url+'/api/data/users', //link json
+        type: 'POST',
+        dataType: 'json',
+        data: new FormData(form),
+        processData: false,
+        contentType: false,
+        success: function(result) {
+          console.log(result);
+          if (result.status == true){
+            $('#exampleModalScrollable').modal('hide');
+            $('body').removeAttr('style');
+            $('body').removeAttr('class');
+            $('.modal-backdrop').remove();
+            callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refesh page
+            swal({
+              title: "Sukses",
+              text: result.message,
+              icon: "success",
+            });
+          } else {
+            swal("Error!", result.message , "error");
+          }
+        }
+      });
+    }else{
+      swal("Perhatian!", 'Lengkapi data terlebih dahulu' , "info");
+    }
+  };
+
+
+
+
+
+
+  //jquery document ready
+  $(document).ready(function() {
+    // datatables
+    var t =$('#example').DataTable({
+        "stateSave": true,
+        "processing": true,
+        "ajax": {
+            "url": url+"/api/data/users",
+            "type": "GET",
+            "dataType": "json",
+        },
+        "order": [[ 1, 'asc' ]],
+        "columns": [{
+                "data": null,
+                "width": "50px",
+                "sClass": "text-center",
+                "orderable": false,
+            },
+            { "data": "no" },
+            { "data": "user" },
+            { "data": "fullname" },
+            // { "data": "email" },
+            { "data": "pass" },
+            { "data": "level" },
+            { "data": "photo",
+              "sClass": "text-center",
+              "orderable": false,
+              "mRender": function (data) {
+                if (data != ""){
+                  var data = "<a href='"+url+"/upload/"+data+"' target='new_windows'><img src='"+url+"/upload/"+data+"' width='150px'/></a>";
+                }else{
+                  var data = "belum ada foto";
+                }
+                return data;
+              }
+            },
+            {
+              "data": "id",
+              "sClass": "text-center",
+              "orderable": false,
+              "mRender": function (data) {
+                  return '<a href="javascript:btnEdit('+ data +');" class="badge badge-info"><i class="fa fa-edit fa-fw"></i> Edit</a> \n\
+                  <a href="javascript:hapus('+ data +');" class="badge badge-danger"><i class="fa fa-trash fa-fw"></i> Delete</a>';
+              }
+            }
+        ],
+    } );
+    t.on( 'order.dt search.dt', function () {
+        t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            cell.innerHTML = i+1;
+        } );
+    } ).draw();
+  });
+</script>

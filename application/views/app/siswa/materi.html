@@ -1,0 +1,352 @@
+<!-- Page Header-->
+<header class="page-header">
+  <div class="container-fluid">
+    <h2 class="no-margin-bottom">Materi</h2>
+  </div>
+</header>
+<!-- Dashboard Section-->
+<section class="dashboard-counts no-padding-bottom">
+  <div class="container-fluid">
+    <div class="row bg-white has-shadow">
+      <div class="col-xl-12 col-sm-12">
+        <div class="row">
+          <div class="col-xl-3 col-sm-3" style="border: solid 1px black; border-radius: 25px;">
+            <div class="text-center text-bold h2 p-3"><u>DAFTAR KELAS</u></div>
+            <div class="container" id="daftar_materi">
+            </div>
+          </div>
+          <div class="col-xl-9 col-sm-9">
+            <!-- Button trigger modal -->
+            <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalScrollable" onclick="javascript:btnTambah();" id="btn-tambah"><i class="fa fa-plus fa-fw"></i> Tambah Data</button> -->
+
+            <div class="table-responsive">
+              <table id="example" class="display table table-stipped table-bordered table-hover" style="width:100%">
+                <thead>
+                  <tr>
+                    <th>NO</th>
+                    <!-- <th>NIP</th> -->
+                    <th>Judul</th>
+                    <!-- <th>Kode Kelas</th> -->
+                    <th>Nama Kelas</th>
+                    <th>Link</th>
+                    <!-- <th>Aksi</th> -->
+                  </tr>
+                </thead>
+                <tfoot>
+                  <tr>
+                    <th>NO</th>
+                    <!-- <th>NIP</th> -->
+                    <th>Judul</th>
+                    <!-- <th>Kode Kelas</th> -->
+                    <th>Nama Kelas</th>
+                    <th>Link</th>
+                    <!-- <th>Aksi</th> -->
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!------------------------------ Modal -------------------------------->
+<div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalScrollableTitle">Modal title</h5>
+        <button type="button" id="close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-validate" id="submit">
+          <div class="form-group" id="input-id">
+            <label for="id" class="col-form-label">ID</label>
+            <input id="id" type="text" name="id" required data-msg="Please enter your id" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="no" class="col-form-label">NIP</label>
+            <input id="no" type="text" name="no" required data-msg="Please enter your nip" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="judul" class="col-form-label">Judul</label>
+            <input id="judul" type="text" name="judul" required data-msg="Please enter your judul" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="kelas" class="col-form-label">Nama Kelas</label>
+            <select id="kelas" name="kelas" required class="form-control">
+            </select>
+          </div>
+<!--           <div class="form-group">
+            <label for="kelas" class="col-form-label">Kelas</label>
+            <input id="kelas" type="text" name="kelas" required data-msg="Please enter your kelas" class="form-control">
+          </div> -->
+          <div class="form-group">
+            <label for="link" class="col-form-label">Link</label>
+            <div class="custom-file">
+              <input type="file" class="form-control" name="link" id="link">
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" onclick="javascript:tambah();" id="btn-save">Save</button>
+        <button type="submit" class="btn btn-warning" onclick="javascript:edit();" id="btn-edit">Edit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!------------------ script --------------------->
+<script>
+  function btnEdit(id){
+    $.ajax({
+      url: url+'/api/data/materi', //link json
+      type: 'GET',
+      dataType: 'json',
+      data: {
+          "id": id,
+      },
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          //include data dari database ke modals
+          $("#id").val(id);
+          $("#no").val(result.data[0].no);
+          $("#judul").val(result.data[0].judul);
+          $("#"+result.data[0].kelas).prop('selected','true');
+
+
+          //setting modals
+          $("#exampleModalScrollable").modal("show");
+          $("#input-id").removeClass("d-none");
+          $("#btn-edit").removeClass("d-none");
+          $("#btn-save").addClass("d-none");
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  }
+
+
+  function edit(){
+    var form = $("form")[0];
+    $.ajax({
+      url: url+'/api/data/edit_materi', //link json
+      type: 'POST',
+      data: new FormData(form),
+      processData: false,
+      contentType: false,
+      success: function(result) {
+        console.log(result);
+        if (result.status == true){
+          $('#exampleModalScrollable').modal('hide');
+          $('body').removeAttr('style');
+          $('body').removeAttr('class');
+          $('.modal-backdrop').remove();
+          callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refresh page
+          swal({
+            title: "Sukses",
+            text: result.message,
+            icon: "success",
+          });
+        } else {
+          swal("Error!", result.message , "error");
+        }
+      }
+    });
+  }
+
+
+
+
+
+
+  function hapus(id){
+    swal({
+      title: "Apa anda yakin?",
+      text: "data yang terhapus tidak dapat dikembalikan!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+
+        $.ajax({
+          url: url+'/api/data/del_materi', //link json
+          type: 'POST',
+          dataType: 'json',
+          data: {
+              'id': id
+          },
+          success: function(result) {
+              console.log(result);
+              if (result.status == true){
+                swal(result.message, {
+                  icon: "success",
+                });
+                callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refresh data
+              }else{
+                swal("Error!", result.message , "error");
+              }
+          }
+        });
+      } else {
+        swal("Aksi dibatalkan!");
+      }
+    });
+  }
+
+
+
+
+
+  function btnTambah(){
+    $("#no").val(localStorage.getItem("no_induk"));
+    $("#judul").val("");
+    // $("#kelas").val("");
+    //setting modals
+    $("#exampleModalScrollable").modal("show");
+    $("#btn-save").removeClass("d-none");
+    $("#btn-edit").addClass("d-none");
+    $("#input-id").addClass("d-none");
+  }
+
+
+
+
+
+
+  function tambah(){
+    var form = $("form")[0];
+      $.ajax({
+        url: url+'/api/data/materi', //link json
+        type: 'POST',
+        dataType: 'json',
+        data: new FormData(form),
+        processData: false,
+        contentType: false,
+        success: function(result) {
+          console.log(result);
+          if (result.status == true){
+            $('#exampleModalScrollable').modal('hide');
+            $('body').removeAttr('style');
+            $('body').removeAttr('class');
+            $('.modal-backdrop').remove();
+            callPage(localStorage.getItem("lokasi"),localStorage.getItem("menu"));//refesh page
+            swal({
+              title: "Sukses",
+              text: result.message,
+              icon: "success",
+            });
+          } else {
+            swal("Error!", result.message , "error");
+          }
+        }
+      });
+  };
+
+
+    // function search(i) {
+    //   t.search(i).draw();
+    //   // $('#example_filter [type="search"]').val(i).keyup();
+    //   // $('#example_filter [type="search"]').val('');
+    //   // alert(i)
+    //   // $('input').attr('type', 'search').val(i).keyup();
+    //   // $('input').attr('type', 'search').keyup();
+    // }
+
+
+
+  //jquery document ready
+  $(document).ready(function() {
+    // datatables
+    var t =$('#example').DataTable({
+        "stateSave": true,
+        "processing": true,
+        "ajax": {
+            url: url+"/api/data/materi_siswa",
+            type: "GET",
+            dataType: "json",
+            data: {
+              "nis": localStorage.getItem("no_induk")
+            }
+        },
+        "order": [[ 1, 'asc' ]],
+        "columns": [{
+                "data": null,
+                "width": "50px",
+                "sClass": "text-center",
+                "orderable": false,
+            },
+            // { "data": "no" },
+            { "data": "judul" },
+            // { "data": "kelas" },
+            { "data": "nama_kelas" },
+            { "data": "link",
+              "sClass": "text-center",
+              "orderable": false,
+              "mRender": function (data) {
+                if (data != ""){
+                  var data = "<a href='"+url+"/upload/materi/"+data+"' target='new_windows'>"+data+"</a>";
+                }else{
+                  var data = "belum ada data";
+                }
+                return data;
+              }
+            },
+            // {
+            //   "data": "id",
+            //   "sClass": "text-center",
+            //   "orderable": false,
+            //   "mRender": function (data) {
+            //       return '<a href="javascript:btnEdit('+ data +');" class="badge badge-info"><i class="fa fa-edit fa-fw"></i> Edit</a> \n\
+            //       <a href="javascript:hapus('+ data +');" class="badge badge-danger"><i class="fa fa-trash fa-fw"></i> Delete</a>';
+            //   }
+            // }
+        ],
+    } );
+    t.on( 'order.dt search.dt', function () {
+        t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            cell.innerHTML = i+1;
+        } );
+    } ).draw();
+
+    //isi input kelas
+    $.ajax({
+      url: url+'/api/data/kelas2', //link json
+      type: 'GET',
+      dataType: 'json',
+      data: {
+        "nis": localStorage.getItem("no_induk")
+      },
+      success: function(result) {
+        // console.log(result);
+        if (result.status == true){
+            var res = result.data;
+            var kelas = [];
+            var daftar = [`<div class="p-1"><button type="button" class="btn btn-info" onclick="$(this).search('');"><i class="fa fa-circle-o fa-fw"></i> Lihat Semua</button></div>`];
+            for(var i in res) {
+              daftar.push(`<div class="p-1"><button type="button" class="btn btn-info" onclick="$.fn.search('`+res[i]["nama_kelas"]+`');"><i class="fa fa-circle-o fa-fw"></i> `+res[i]["nama_kelas"]+`</button></div>`);
+            }
+            $("#daftar_materi").html(daftar.join(""));
+            // console.log(localStorage.getItem("no_induk"))
+            // console.log(res)
+        }
+      }
+    });
+
+    $.fn.search = function(i) {
+      t.search(i).draw();
+    };
+
+  });
+</script>
